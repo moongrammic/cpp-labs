@@ -1,1 +1,1 @@
-# Шаблон настройки GitHub Actions
+# Обновленный GitHub Actions
