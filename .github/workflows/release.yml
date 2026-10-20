@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -27,15 +27,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libboost-test-dev
 
-      - name: Install Boost (macOS)
-        if: runner.os == 'macOS'
-        run: brew install boost
-
       - name: Install Boost (Windows)
         if: runner.os == 'Windows'
         run: C:/vcpkg/vcpkg.exe install boost-test:x64-windows
 
-      - name: Configure (Linux, macOS)
+      - name: Configure (Linux)
         if: runner.os != 'Windows'
         run: cmake -S . -B build -DPATCH_VERSION=${{ github.run_number }}
 
@@ -46,7 +42,7 @@ jobs:
       - name: Build
         run: cmake --build build --config Release
 
-      - name: Run program (Linux, macOS)
+      - name: Run program (Linux)
         if: runner.os != 'Windows'
         run: ./build/helloworld_cli
 
@@ -67,7 +63,6 @@ jobs:
           name: package-${{ runner.os }}
           path: |
             build/helloworld-*.deb
-            build/helloworld-*.tar.gz
             build/helloworld-*.zip
 
   release:
@@ -84,6 +79,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          if gh release view v1.0.${{ github.run_number }} --repo "${{ github.repository }}" > /dev/null 2>&1; then
+            gh release delete v1.0.${{ github.run_number }} --repo "${{ github.repository }}" --yes --cleanup-tag
+          fi
           gh release create v1.0.${{ github.run_number }} dist/* \
             --repo "${{ github.repository }}" \
             --title "Release 1.0.${{ github.run_number }}" \
