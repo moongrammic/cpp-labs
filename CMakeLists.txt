@@ -59,10 +59,12 @@ endif()
 
 install(TARGETS helloworld_cli RUNTIME DESTINATION bin)
 
-if (UNIX AND NOT APPLE)
-    set(CPACK_GENERATOR DEB)
-else()
+if (WIN32)
+    set(CPACK_GENERATOR ZIP)
+elseif (APPLE)
     set(CPACK_GENERATOR TGZ)
+else()
+    set(CPACK_GENERATOR DEB)
 endif()
 
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
