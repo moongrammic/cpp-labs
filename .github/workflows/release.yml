@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - feature/github_actions
+      - lab2 
 
 permissions: write-all
 
