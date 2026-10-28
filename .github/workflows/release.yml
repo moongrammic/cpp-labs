@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - feature/github_actions
-      - lab2 
+      - lab2
 
 permissions: write-all
 
@@ -45,11 +45,17 @@ jobs:
 
       - name: Run program (Linux)
         if: runner.os != 'Windows'
-        run: ./build/helloworld_cli
+        run: |
+          ./build/ip_filter < ip_filter.tsv > result.txt
+          wc -l result.txt
+          echo "24e7a7b2270daee89c64d3ca5fb3da1a  result.txt" | md5sum -c -
 
       - name: Run program (Windows)
         if: runner.os == 'Windows'
-        run: ./build/Release/helloworld_cli.exe
+        run: |
+          ./build/Release/ip_filter.exe < ip_filter.tsv | tr -d '\r' > result.txt
+          wc -l result.txt
+          echo "24e7a7b2270daee89c64d3ca5fb3da1a  result.txt" | md5sum -c -
 
       - name: Test
         run: ctest --test-dir build -C Release --output-on-failure
@@ -63,8 +69,8 @@ jobs:
         with:
           name: package-${{ runner.os }}
           path: |
-            build/helloworld-*.deb
-            build/helloworld-*.zip
+            build/ip_filter-*.deb
+            build/ip_filter-*.zip
 
   release:
     needs: build
